@@ -113,6 +113,7 @@ static uint64_t ibvsmad_craccess_rw_smp(u_int32_t memory_address, int method, u_
 	u_int32_t mask = 0;
 	unsigned int data_offset = 0;
 	unsigned int use_mode_2 = should_use_mode_2(memory_address, num_of_dwords);
+	int rv;
 
 	if (num_of_dwords > MAX_IB_SMP_DATA_DW_NUM) {
 		IBERROR(("size is too big, maximum number of dwords is %d", MAX_IB_SMP_DATA_DW_NUM));
@@ -127,12 +128,19 @@ static uint64_t ibvsmad_craccess_rw_smp(u_int32_t memory_address, int method, u_
 		attribute_mod = create_attribute_mode_0(memory_address, num_of_dwords);
 	}
 	if (method == IB_MAD_METHOD_GET) {
-		for (i = 0; i < num_of_dwords; i++)
+		for (i = 0; i < num_of_dwords; i++) {
 			BYTES_TO_DWORD_BE(data + i, mad_data + IB_DATA_INDEX + data_offset + (i * 4));
+			rv = IB_DATA_INDEX + data_offset + (i * 4);
+			printf("line 134 %d\n", rv);
+		}			
 	} else {
 		for (i = 0; i < num_of_dwords; i++) {
 			DWORD_TO_BYTES_BE(mad_data + IB_DATA_INDEX + data_offset + (i * 4), data + i);
+			rv = IB_DATA_INDEX + data_offset + (i * 4);
+			printf("line 140 %d\n", rv);
 			DWORD_TO_BYTES_BE(mad_data + IB_DATA_INDEX + CONFIG_ACCESS_MODE_2_BITMASK_OFFSET + (i * 4), &mask);
+			rv = IB_DATA_INDEX + CONFIG_ACCESS_MODE_2_BITMASK_OFFSET + (i * 4);
+			printf("line 143 %d\n", rv);
 		}
 	}
 
@@ -149,6 +157,7 @@ static uint64_t ibvsmad_craccess_rw_vs(u_int32_t memory_address,int method, u_in
 	u_int64_t vskey = 0;
 	unsigned int data_offset = 0;
 	int use_mode_2 = should_use_mode_2(memory_address, num_of_dwords);
+	int rv;
 
 	if (data == NULL)
 		return BAD_RET_VAL;
@@ -170,12 +179,19 @@ static uint64_t ibvsmad_craccess_rw_vs(u_int32_t memory_address,int method, u_in
 	for (i = 0; i < num_of_dwords; i++) {
 		if (method == IB_MAD_METHOD_SET) {
 			DWORD_TO_BYTES_BE(vsmad_data + IB_DATA_INDEX + data_offset + (i * 4), data + i);
+			rv = IB_DATA_INDEX + data_offset + (i * 4);
+			printf("line 183 %d\n", rv);
 			DWORD_TO_BYTES_BE(vsmad_data + IB_DATA_INDEX + CONFIG_ACCESS_MODE_2_BITMASK_OFFSET + (i * 4), &mask);
+			rv = IB_DATA_INDEX + CONFIG_ACCESS_MODE_2_BITMASK_OFFSET + (i * 4);
+			printf("line 186 %d\n", rv);
 		}
 	}
 
-	for (i = 0; i < num_of_dwords; i++)
+	for (i = 0; i < num_of_dwords; i++) {
 		BYTES_TO_DWORD_BE(data + i, vsmad_data + IB_DATA_INDEX + data_offset + (i * 4));
+		rv = IB_DATA_INDEX + data_offset + (i * 4);
+		printf("line 193 %d\n", rv);
+	}	
 	return 0;
 }
 
@@ -183,15 +199,11 @@ int main()
 {
 	u_int32_t memory_address = 0;
 	int method = IB_MAD_METHOD_SET;
-	u_int8_t num_of_dwords = 0;
+	u_int8_t num_of_dwords = 14;
 	u_int32_t data = 0;
-	uint64_t res;
 
-	res = ibvsmad_craccess_rw_smp(memory_address, method,num_of_dwords, &data);
+	ibvsmad_craccess_rw_smp(memory_address, method,num_of_dwords, &data);
+	ibvsmad_craccess_rw_vs(memory_address, method, num_of_dwords, &data);
 
-	return res;
-
-	res = ibvsmad_craccess_rw_vs(memory_address, method, num_of_dwords, &data);;
-
-	return res;
+	return 0;
 }
