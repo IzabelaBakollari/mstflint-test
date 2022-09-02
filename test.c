@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include "string.h"
 #include <stdlib.h>
+#include <errno.h>
 
 /* #include "calc_hw_crc.h" */
 
@@ -75,13 +76,16 @@ u_int16_t calc_hw_crc(u_int8_t *d, int size)
 {
     int i;
     u_int8_t *data = (u_int8_t*) malloc(sizeof(u_int8_t) * size);
+    
+    if (!data)
+        return ENOMEM;
 
     memcpy(data, d, size);
     data[0] = ~data[0];
     data[1] = ~data[1];
 
     unsigned crc = 0xffff;
-    printf("size is %d\n", size);
+    //  printf("size is %d\n", size);
     for (i = 0; i < size; i++)
     {
         int table_index = ((crc ^ data[i]) & 0xff);
@@ -95,11 +99,17 @@ u_int16_t calc_hw_crc(u_int8_t *d, int size)
 
 int main() {
 
-    int size = 255;
-    u_int8_t d =1;
-    int r = (int)calc_hw_crc(&d, 1);
+    int i;
+    //u_int8_t d = 1;
+    //int r = (int)calc_hw_crc(&d, 1);
 
-    printf("r is %d", r);
+    u_int8_t *crc16table2_pointer[256] = (u_int8_t *) crc16table2[256];
 
-    return r;
+    for (i = 0; i < 256; i++) {
+
+        int r = (int)calc_hw_crc(*crc16table2_pointer[i], 1);
+
+        printf("return is %d", r);
+    }
+    return 0;
 }
