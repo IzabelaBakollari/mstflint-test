@@ -99,11 +99,15 @@ u_int16_t calc_hw_crc(u_int8_t *d, int size)
 
 int main() {
 
-    u_int8_t *crc16table2_pointer[256] = (u_int8_t *) crc16table2[256];
+    u_int8_t *table = (u_int8_t *) crc16table2;
+    u_int8_t string[] = "Hello World";
+    int crc = (int)calc_hw_crc(table, sizeof(crc16table2));
 
-    int r = (int)calc_hw_crc(*crc16table2_pointer, 1);
+    printf("return_1 is %d\n", crc);
 
-    printf("return is %d", r);
+    crc =(int)calc_hw_crc(string, sizeof(string));
+    printf("return_2 is %d\n", crc);
+
     
     return 0;
 }
