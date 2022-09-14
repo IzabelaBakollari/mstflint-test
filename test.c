@@ -75,38 +75,39 @@ u_int16_t crc16table2[256] = {
 u_int16_t calc_hw_crc(u_int8_t *d, int size)
 {
     int i;
-    //u_int8_t *data = (u_int8_t*) malloc(sizeof(u_int8_t) * size);
+    u_int8_t *data = (u_int8_t*) malloc(sizeof(u_int8_t) * size);
     
-    //if (!data)
-    //    exit(EXIT_FAILURE);
+    if (!data)
+        exit(EXIT_FAILURE);
 
-    //memcpy(data, d, size);
-    d[0] = ~d[0];
-    d[1] = ~d[1];
+    memcpy(data, d, size);
+    data[0] = ~data[0];
+    data[1] = ~data[1];
 
     unsigned crc = 0xffff;
     //  printf("size is %d\n", size);
     for (i = 0; i < size; i++)
     {
-        int table_index = ((crc ^ d[i]) & 0xff);
+        int table_index = ((crc ^ data[i]) & 0xff);
         crc = ((crc >> 8) ^ crc16table2[table_index]);
     }
     crc = ((crc << 8) & 0xff00) | ((crc >> 8) & 0xff);
 
-    //free(data);
+    free(data);
     return crc;
 }
 
 int main() {
 
     u_int8_t *table = (u_int8_t *) crc16table2;
-    u_int8_t string[] = "Hello World";
-    int crc = (int)calc_hw_crc(table, sizeof(crc16table2));
+    static u_int8_t string[] = "Hello World";
+    int crc = calc_hw_crc(table, sizeof(crc16table2));
 
     printf("return_1 is %d\n", crc);
 
-    crc =(int)calc_hw_crc(string, sizeof(string));
+    crc = calc_hw_crc(string, sizeof(string)-1);
     printf("return_2 is %d\n", crc);
+    printf("string is %s\n", string);
 
     
     return 0;
