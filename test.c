@@ -77,16 +77,16 @@ u_int16_t calc_hw_crc(u_int8_t *d, int size)
     int i;
     int table_index;
 
-    //u_int8_t data[size];
+    u_int8_t data[size];
 
     unsigned crc = 0xffff;
     for (i = 0; i < size; i++)
     {   
-        //data[i] = d[i];
+        data[i] = d[i];
         if (i == 0 || i == 1) {
-            d[i] = ~d[i];    
+            data[i] = ~data[i];    
         }
-        table_index = ((crc ^ d[i]) & 0xff);
+        table_index = ((crc ^ data[i]) & 0xff);
         crc = ((crc >> 8) ^ crc16table2[table_index]);
     }
     crc = ((crc << 8) & 0xff00) | ((crc >> 8) & 0xff);
