@@ -76,12 +76,11 @@ u_int16_t calc_hw_crc(u_int8_t *d, int size)
 {
     int i;
     int table_index;
-    int length = sizeof(crc16table2);
 
-    u_int8_t data[length];
+    u_int8_t data[size];
 
-    for (int i = 0; i < length; i++) {
-        for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < size; i++) {
+        if (i ==0 || i==1) {
             data[i] = ~d[i];    
         }
         data[i] = d[i];     
